@@ -1,0 +1,12 @@
+User: 
+Represents the user entity with attributes such as id, first_name, last_name, email, and password. The id serves as the primary key, and email is unique.
+
+Blog: 
+Represents the blog/article entity with attributes such as id, title, description, author, state, read_count, reading_time, tags, body, and timestamp. The id serves as the primary key, and title is unique.
+
+User Blog: Represents the many-to-many relationship between users and blogs. It indicates which user has authored which blogs.
+
+Relationships:
+Each user can author multiple blogs (one-to-many relationship).
+Each blog is authored by exactly one user (many-to-one relationship).
+Users can have many blogs, and each blog can have many users associated with it (many-to-many relationship). This is represented by the User Blog table, which acts as a junction table to resolve the many-to-many relationship between users and blogs.
