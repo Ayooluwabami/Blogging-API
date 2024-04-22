@@ -50,6 +50,11 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something went wrong!');
 });
 
+// Define route for the root path ("/")
+app.get('/', (req, res) => {
+  res.send('Hello, world!');
+});
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
