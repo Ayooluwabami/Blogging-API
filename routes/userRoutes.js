@@ -5,12 +5,17 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const config = require('../config/config');
 const { authenticateToken } = require('../middleware/authMiddleware');
-const { signup, signin } = require('../controllers/userController');
-const { createBlog, updateBlog, deleteBlog, getBlogs, getBlog } = require('../controllers/blogController');
+const { signupSchema, signinSchema } = require('../validators/userValidator'); 
+
 
 // User Signup Route
-router.post('/signup', async (req, res) => {
+router.post('/signup', async (req, res, next) => {
   try {
+    const { error } = signupSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const { first_name, last_name, email, password } = req.body;
 
     // Check if user already exists
@@ -39,8 +44,13 @@ router.post('/signup', async (req, res) => {
 });
 
 // User Signin Route
-router.post('/signin', async (req, res) => {
+router.post('/signin', async (req, res, next) => {
   try {
+    const { error } = signinSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const { email, password } = req.body;
 
     // Check if user exists
@@ -63,6 +73,10 @@ router.post('/signin', async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
+});
+
+router.get('/protected-route', authenticateToken, (req, res) => {
+  res.json({ message: 'Access granted!', user: req.user });
 });
 
 module.exports = router;

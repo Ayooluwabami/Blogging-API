@@ -2,11 +2,25 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const config = require('../config/config');
+const Joi = require('joi');
+
+  // Joi validation schema for signup endpoint
+const signupSchema = Joi.object({
+  first_name: Joi.string().required(),
+  last_name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().required()
+});
 
 const signup = async (req, res) => {
   try {
-    const { first_name, last_name, email, password } = req.body;
+    const { error } = signupSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
+    const { first_name, last_name, email, password } = req.body;
+    
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {

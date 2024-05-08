@@ -1,4 +1,14 @@
 const Blog = require('../models/blog');
+const Joi = require('joi');
+
+// Joi validation schema for createBlog endpoint
+const createBlogSchema = Joi.object({
+  title: Joi.string().required(),
+  description: Joi.string().optional(),
+  tags: Joi.array().items(Joi.string()).optional(),
+  state: Joi.string().valid('draft', 'published').optional(),
+  body: Joi.string().required()
+});
 
 // Function to calculate reading time based on content length
 function calculateReadingTime(body) {
@@ -14,6 +24,11 @@ function calculateReadingTime(body) {
 // Create a new blog
 exports.createBlog = async (req, res) => {
   try {
+    const { error } = createBlogSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const { title, description, tags, state, body } = req.body;
     const { userId: author } = req.user;
     const timestamp = new Date();
@@ -22,7 +37,7 @@ exports.createBlog = async (req, res) => {
 
     const newBlog = new Blog({ title, description, tags, author, timestamp, state, read_count, reading_time, body });
     await newBlog.save();
-    
+
     res.status(201).json({ message: 'Blog created successfully', blog: newBlog });
   } catch (error) {
     console.error(error);

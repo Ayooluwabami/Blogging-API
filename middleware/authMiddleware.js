@@ -1,6 +1,11 @@
-
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
+const Joi = require('joi');
+
+// Define the Joi validation schema for the authentication token
+const authTokenSchema = Joi.object({
+  token: Joi.string().required()
+});
 
 // Middleware function to authenticate JWT token
 const authenticateToken = (req, res, next) => {
